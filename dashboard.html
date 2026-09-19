@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - DKU Dev Portal</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="dashboard">
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar__brand">DKU Dev Portal</div>
+    <nav class="sidebar__nav" aria-label="주 메뉴">
+      <a class="sidebar__link" data-nav="home" href="index.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 7.5L8 2.5l6 5M3.5 6.5V13.5h9V6.5"/></svg>
+        Home
+      </a>
+      <a class="sidebar__link" data-nav="dashboard" href="dashboard.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/></svg>
+        Dashboard
+      </a>
+      <a class="sidebar__link" data-nav="history" href="history.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg>
+        History
+      </a>
+      <a class="sidebar__link" data-nav="guided" href="survey.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 4h10M3 8h10M3 12h6"/></svg>
+        Guided Setup
+      </a>
+      <a class="sidebar__link" data-nav="new" href="builder.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 2v12M2 8h12"/></svg>
+        New Env
+      </a>
+      <a class="sidebar__link" data-nav="mypage" href="mypage.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="5.5" r="2.5"/><path d="M3 13.5c.6-2.6 2.6-4 5-4s4.4 1.4 5 4"/></svg>
+        My Page
+      </a>
+      <a class="sidebar__link" data-nav="help" href="help.html">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.2c.2-1 1-1.5 1.8-1.5 1 0 1.7.6 1.7 1.4 0 1.2-1.7 1.3-1.7 2.6M8 11.2v.1"/></svg>
+        Help
+      </a>
+    </nav>
+    <div class="quota" id="quota-widget"></div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar"><span>서버 생성부터 배포까지 한곳에서</span><div class="topbar__user" id="topbar-user"></div></header>
+    <main class="main">
+      <div class="page-head">
+        <h1>내 자원</h1>
+        <p>생성한 VM을 계속 관리합니다. 기한 연장, 중지와 시작, 사양 변경, 반납이 여기서 이루어집니다.</p>
+      </div>
+
+      <div class="banner" id="expiry-banner" role="alert" hidden></div>
+      <div class="banner banner--tip" id="sched-banner" hidden></div>
+
+      <div class="approvals" id="approval-section" hidden></div>
+
+      <div class="summary-strip" aria-label="내 자원 요약">
+        <span><b id="stat-running">0</b> 실행 중</span>
+        <span><b id="stat-stopped">0</b> 중지됨</span>
+        <span><b id="stat-expiring">0</b> 만료 임박</span>
+        <span title="4개 항목 중 지키고 있는 평균 개수"><b id="stat-hygiene">-</b> 평균 위생 점수</span>
+        <span class="summary-strip__end">하루 청구 <b id="stat-daily"></b> <span id="stat-forecast"></span></span>
+      </div>
+      <div id="dash-body">
+        <div class="toolbar toolbar--scope">
+          <div class="scope" role="group" aria-label="볼 서버의 범위" id="owner-filter">
+            <button type="button" data-action="filter" data-filter="mine" aria-pressed="true">내 자원</button>
+            <button type="button" data-action="filter" data-filter="team" aria-pressed="false">우리 팀</button>
+            <button type="button" data-action="filter" data-filter="all" aria-pressed="false">연구실 전체</button>
+          </div>
+          <div class="toolbar__tools">
+            <div class="search">
+              <input class="input input--search" id="dash-search" type="search" autocomplete="off" placeholder="이름, ID, 소유자, 프로젝트 검색" aria-label="서버 검색">
+              <kbd class="search__key" aria-hidden="true">/</kbd>
+            </div>
+            <div class="opt" id="opt-wrap">
+              <button type="button" class="btn btn--secondary" id="opt-btn" aria-expanded="false" aria-controls="opt-pop">보기 옵션 <span class="opt__count" id="opt-count" hidden></span></button>
+              <div class="opt-pop" id="opt-pop" hidden>
+                <label class="opt-pop__row" for="dash-sort"><span>정렬</span>
+                  <select class="select select--inline" id="dash-sort" aria-label="정렬">
+                    <option value="expiry">만료 임박순</option>
+                    <option value="name">이름순</option>
+                    <option value="cost">일일 요금 높은순</option>
+                    <option value="recent">최근 생성순</option>
+                  </select>
+                </label>
+                <div class="opt-pop__row"><span>묶어 보기</span>
+                  <div class="seg seg--sm" id="view-mode" role="group" aria-label="보기 방식">
+                    <button type="button" data-action="view-mode" data-mode="list" aria-pressed="true">묶지 않음</button>
+                    <button type="button" data-action="view-mode" data-mode="project" aria-pressed="false">프로젝트별</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tagbar" id="tag-bar" hidden></div>
+        <p class="scope-note" id="scope-note" hidden></p>
+
+        <div class="proj-list" id="project-view" hidden></div>
+        <section class="card table-wrap" id="table-card">
+          <table class="table">
+            <thead>
+              <tr><th>상태</th><th>리소스명</th><th>사양</th><th>사용량</th><th>남은 기한</th><th>일일 요금</th><th>작업</th></tr>
+            </thead>
+            <tbody id="resource-list"></tbody>
+          </table>
+        </section>
+
+        <section class="card empty-state" id="no-match" hidden>
+          <p>조건에 맞는 서버가 없습니다.</p>
+          <button type="button" class="btn btn--secondary" data-action="clear-conditions">조건 지우기</button>
+        </section>
+
+        <details class="card trash" id="trash-section" hidden>
+          <summary id="trash-summary">휴지통</summary>
+          <div id="trash-list"></div>
+        </details>
+
+        <section class="card empty-state" id="empty-state" hidden>
+          <p id="empty-title">할당된 환경이 없습니다.</p>
+          <div class="empty-presets" id="empty-presets"></div>
+          <a class="btn btn--secondary" href="index.html">직접 골라서 만들기</a>
+        </section>
+      </div>
+
+      <div class="drawer__scrim" id="detail-scrim" hidden></div>
+      <aside class="drawer" id="detail-panel" aria-label="서버 상세" hidden></aside>
+      <dialog id="team-dialog" aria-labelledby="td-title" class="dialog--wide">
+        <h2 id="td-title"></h2>
+        <div class="td-section">
+          <div class="td-h" id="td-members-h"></div>
+          <div id="td-members"></div>
+        </div>
+        <div class="td-section">
+          <div class="td-h">팀원 추가</div>
+          <div class="td-add">
+            <input class="input" id="td-search" type="text" autocomplete="off" placeholder="학번 또는 이름 검색 (2자 이상)" aria-label="팀원 검색">
+            <select class="select select--inline" id="td-role" aria-label="추가할 권한"></select>
+            <button type="button" class="btn" id="td-add" data-action="td-add" disabled>추가</button>
+          </div>
+          <div class="td-results" id="td-results"></div>
+        </div>
+        <div class="td-section">
+          <div class="td-h">소유권 이전</div>
+          <p class="muted-p">팀원 중 한 명에게 이 서버를 넘깁니다. 넘기면 되돌릴 수 없습니다.</p>
+          <div class="td-add">
+            <select class="select" id="td-transfer" aria-label="받을 사람"></select>
+            <button type="button" class="btn btn--danger" id="td-transfer-btn" data-action="td-transfer" disabled>이전하기</button>
+          </div>
+        </div>
+        <div class="actions"><button type="button" class="btn btn--secondary" data-action="td-close">닫기</button></div>
+      </dialog>
+
+      <dialog id="change-dialog" aria-labelledby="cd-title">
+        <h2 id="cd-title"></h2>
+        <p id="cd-sub"></p>
+        <div class="choices choices--compact" id="cd-choices"></div>
+        <div id="cd-diff"></div>
+        <div id="cd-alerts"></div>
+        <div class="actions">
+          <button type="button" class="btn btn--secondary" data-action="cancel">취소</button>
+          <button type="button" class="btn" id="cd-confirm" data-action="confirm" disabled>사양 변경</button>
+        </div>
+      </dialog>
+    </main>
+  </div>
+</div>
+
+<script src="assets/catalog.js"></script>
+<script src="assets/state.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

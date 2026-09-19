@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>로그인 - DKU Dev Portal</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-page="login">
+<div class="login-wrap">
+  <main class="card login-card">
+    <div class="login-brand">DKU Dev Portal</div>
+    <h1>로그인</h1>
+    <p>학교 계정으로 로그인하고 실습 서버를 만들어 보세요. 서버 생성부터 배포까지 한곳에서.</p>
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label class="field__label" for="login-id">아이디</label>
+        <input class="input" id="login-id" name="id" type="text" autocomplete="username" value="soft2021">
+      </div>
+      <div class="field">
+        <label class="field__label" for="login-pw">비밀번호</label>
+        <input class="input" id="login-pw" name="pw" type="password" autocomplete="current-password" value="dku2026">
+      </div>
+      <div class="form-error" id="login-error" role="alert"></div>
+      <button type="submit" class="btn">로그인</button>
+    </form>
+    <p class="login-hint">프로토타입 데모 계정이 미리 입력되어 있습니다. 실제 인증은 하지 않습니다.</p>
+  </main>
+</div>
+<script src="assets/catalog.js"></script>
+<script src="assets/state.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
